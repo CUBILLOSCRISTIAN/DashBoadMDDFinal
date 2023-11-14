@@ -47,10 +47,10 @@ class Query(ObjectType):
         data = DATA.REGION
         return data
 
-    def resolve_geoLocation(self, info, location):
+    def resolve_geoLocation(self, info, location=None):
         data = DATA.GEOLOCATION
         if location:
-            data = filter(lambda x: x['tipo' == location], data)
+            data = [*filter(lambda x: x.tipo == location, data)]
         return data
     
 schema = Schema(query=Query)

@@ -7,6 +7,7 @@ from .utils import (
     generate_region_media_mediana_graph,
     generate_region_estaciones_velocidad_graph,
     generate_region_map_graph,
+    generate_region_rose_diagram
 )
 
 class GeneralDataView(TemplateView):
@@ -107,11 +108,13 @@ class RegionDataView(TemplateView):
         region_media_mediana_graph = generate_region_media_mediana_graph(result_, 'region_media_mediana')
         region_media_estaciones_graph = generate_region_estaciones_velocidad_graph(result_, 'region_media_estaciones')
         region_map_graph = generate_region_map_graph(result_, geoResult_, 'region_map')
+        region_rose_graph = generate_region_rose_diagram(result_, 'region_rose')
         
         kwargs.update({
             'region_media_mediana_url': region_media_mediana_graph,
             'region_media_estaciones_url': region_media_estaciones_graph,
             'region_map_url': region_map_graph,
+            'region_rose_url': region_rose_graph,
         })
         
         return super().get_context_data(**kwargs)
