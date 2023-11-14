@@ -81,6 +81,30 @@ def generate_departamento_media_mediana_graph(data, name):
     plot(fig, filename=path, auto_open=False)
     return f'graphs/{name}.html'
 
+def generate_departamento_estaciones_velocidad_graph(data, name):
+    path = f'{settings.GRAPHS}/{name}.html'
+    if os.path.exists(path):
+        return f'graphs/{name}.html'
+
+    df = DataFrame(data)
+    df.rename(columns={'nombre': 'DEPARTAMENTO', 'noEstaciones': 'CANTIDAD ESTACIONES', 'avgVel': 'MEDIA', 'medVel': 'MEDIANA'}, inplace=True)
+    df_long = pd.melt(df, id_vars=['DEPARTAMENTO'], value_vars=['MEDIA', 'CANTIDAD ESTACIONES'],
+                  var_name='estadistica', value_name='valor')
+
+    # Crea el gráfico de barras
+    fig = px.bar(
+        df_long,
+        x="DEPARTAMENTO",
+        y="valor",
+        color="estadistica",
+        barmode='group',  # Agrupa las barras para cada departamento
+        labels={'valor': 'Velocidad vs Estaciones', 'DEPARTAMENTO': 'Departamentos'},
+        title='Comparación de Media y Cantidad de estaciones por Departamento'
+    )
+    
+    plot(fig, filename=path, auto_open=False)
+    return f'graphs/{name}.html'
+
 def generate_region_estaciones_velocidad_graph(data, name):
     path = f'{settings.GRAPHS}/{name}.html'
     if os.path.exists(path):
