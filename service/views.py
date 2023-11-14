@@ -7,6 +7,8 @@ from .utils import (
     generate_region_media_mediana_graph,
     generate_region_estaciones_velocidad_graph,
     generate_region_map_graph,
+    generate_departamento_media_mediana_graph,
+    generate_departamento_estaciones_velocidad_graph
 )
 
 class GeneralDataView(TemplateView):
@@ -112,6 +114,47 @@ class RegionDataView(TemplateView):
             'region_media_mediana_url': region_media_mediana_graph,
             'region_media_estaciones_url': region_media_estaciones_graph,
             'region_map_url': region_map_graph,
+        })
+        
+        return super().get_context_data(**kwargs)
+
+
+class DepartamentoDataView(TemplateView):
+    template_name = 'service/departamento.html'
+
+    def get_context_data(self, **kwargs):
+
+        query = """
+            {
+                departamento{
+                    nombre
+                    medVel
+                    avgVel
+                    medDir
+                    avgDir
+                    noEstaciones
+                }
+            }
+        """
+        result_ = schema.execute(query).data['departamento']
+        query = """
+            {
+                geoLocation(location: "departamento"){
+                    nombre
+                    propiedades
+                }
+            }
+        """
+        geoResult_ = schema.execute(query).data['geoLocation']
+
+        departamento_media_mediana_graph = generate_departamento_media_mediana_graph(result_, 'departamento_media_mediana')
+        departamento_media_estaciones_graph = generate_departamento_estaciones_velocidad_graph(result_, 'departamento_media_estaciones')
+        # departamento_map_graph = generate_region_map_graph(result_, geoResult_, 'region_map')
+        
+        kwargs.update({
+            'departamento_media_mediana_url': departamento_media_mediana_graph,
+            'departamento_media_estaciones_url': departamento_media_estaciones_graph,
+            # 'region_map_url': departamento_map_graph,
         })
         
         return super().get_context_data(**kwargs)
