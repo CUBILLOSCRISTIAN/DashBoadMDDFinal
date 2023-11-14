@@ -18,7 +18,7 @@ def df_to_geojson(df):
             'geometry': {}
         }
         
-        feature['geometry'] = json.loads(element['geometry'])
+        feature['geometry'] = json.loads(element['propiedades'])
         if 'Nariño' in element['name']:
                 feature['properties']['name'] = 'Narino'
         if 'san andres' in element['name']:
@@ -26,18 +26,21 @@ def df_to_geojson(df):
         elif 'bogota' in element['name']:
             feature['properties']['name'] = 'Bogota d.c'
         else:
-            feature['properties']['name'] = element['REGION']
+            feature['properties']['name'] = element['nombre']
         geojson['features'].append(feature)
     return geojson
 
-def generate_region_graph(data, name):
+def generate_region_map_graph(data, geoData, name):
     path = f'{settings.GRAPHS}/{name}.html'
     if os.path.exists(path):
         return f'graphs/{name}.html'
     df = DataFrame(data)
+    df['region'] = df['region'].str.capitalize()
+    df.loc[df['region'] == 'Insular', 'region'] = 'Caribe'
+    df = df.groupby('region', as_index=False)['medVel'].mean()
     
     fig = px.choropleth_mapbox(
-        geojson = df_to_geojson(df),
+        geojson = df_to_geojson(geoData),
         locations = 'region',
         featureidkey = 'properties.name',
         color = 'medVel',
@@ -53,26 +56,91 @@ def generate_region_graph(data, name):
     plot(fig, filename=path, auto_open=False)
     return f'graphs/{name}.html'
 
-def generate_departamento_graph(data, name):
+def generate_departamento_media_mediana_graph(data, name):
     path = f'{settings.GRAPHS}/{name}.html'
     if os.path.exists(path):
         return f'graphs/{name}.html'
 
     df = DataFrame(data)
-    df.rename(columns={'nombre': 'DEPARTAMENTO', 'cantidadEstaciones': 'CANTIDAD ESTACIONES', 'mediaVelocidad': 'MEDIA', 'medianaVelocidad': 'MEDIANA'}, inplace=True)
-    df_long = pd.melt(df, id_vars=['departamento'], value_vars=['mediaVelocidad', 'medianaVelocidad'],
+    df.rename(columns={'nombre': 'DEPARTAMENTO', 'cantidadEstaciones': 'CANTIDAD ESTACIONES', 'avgVel': 'MEDIA', 'medVel': 'MEDIANA'}, inplace=True)
+    df_long = pd.melt(df, id_vars=['DEPARTAMENTO'], value_vars=['MEDIA', 'MEDIANA'],
                   var_name='estadistica', value_name='valor')
 
     # Crea el gráfico de barras
     fig = px.bar(
         df_long,
-        x="departamento",
+        x="DEPARTAMENTO",
         y="valor",
         color="estadistica",
         barmode='group',  # Agrupa las barras para cada departamento
-        labels={'valor': 'Valor', 'departamento': 'Departamentos'},
+        labels={'valor': 'Velocidad', 'DEPARTAMENTO': 'Departamentos'},
         title='Comparación de Media y Mediana por Departamento'
     )
 
     plot(fig, filename=path, auto_open=False)
-    return f'graphs/{name}.html'    
+    return f'graphs/{name}.html'
+
+def generate_region_estaciones_velocidad_graph(data, name):
+    path = f'{settings.GRAPHS}/{name}.html'
+    if os.path.exists(path):
+        return f'graphs/{name}.html'
+
+    df = DataFrame(data)
+    df.rename(columns={'region': 'REGION', 'noEstaciones': 'CANTIDAD ESTACIONES', 'avgVel': 'MEDIA', 'medVel': 'MEDIANA'}, inplace=True)
+    df_long = pd.melt(df, id_vars=['REGION'], value_vars=['MEDIA', 'CANTIDAD ESTACIONES'],
+                  var_name='estadistica', value_name='valor')
+
+    # Crea el gráfico de barras
+    fig = px.bar(
+        df_long,
+        x="REGION",
+        y="valor",
+        color="estadistica",
+        barmode='group',  # Agrupa las barras para cada departamento
+        labels={'valor': 'Velocidad vs Estaciones', 'REGION': 'Región'},
+        title='Comparación de Media y Cantidad de estaciones por Región'
+    )
+    
+    plot(fig, filename=path, auto_open=False)
+    return f'graphs/{name}.html'
+
+def generate_region_media_mediana_graph(data, name):
+    path = f'{settings.GRAPHS}/{name}.html'
+    if os.path.exists(path):
+        return f'graphs/{name}.html'
+
+    df = DataFrame(data)
+    df.rename(columns={'region': 'REGION', 'noEstaciones': 'CANTIDAD ESTACIONES', 'avgVel': 'MEDIA', 'medVel': 'MEDIANA'}, inplace=True)
+    df_long = pd.melt(df, id_vars=['REGION'], value_vars=['MEDIA', 'MEDIANA'],
+                  var_name='estadistica', value_name='valor')
+
+    # Crea el gráfico de barras
+    fig = px.bar(
+        df_long,
+        x="REGION",
+        y="valor",
+        color="estadistica",
+        barmode='group',  # Agrupa las barras para cada departamento
+        labels={'valor': 'Velocidad', 'REGION': 'Región'},
+        title='Comparación de Media y Mediana por Región'
+    )
+
+    plot(fig, filename=path, auto_open=False)
+    return f'graphs/{name}.html'
+
+def generate_anios_graph(data, name):
+    path = f'{settings.GRAPHS}/{name}.html'
+    if os.path.exists(path):
+        return f'graphs/{name}.html'
+
+    df = DataFrame(data)
+    df.rename(columns={'fecha': 'Fecha', 'mediaViento': 'Velocidad Media'}, inplace=True)
+
+    fig = px.line(
+        df,
+        x="Fecha",
+        y="Velocidad Media"
+    )
+
+    plot(fig, filename=path, auto_open=False)
+    return f'graphs/{name}.html'
