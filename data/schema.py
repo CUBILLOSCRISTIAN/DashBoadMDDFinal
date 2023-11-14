@@ -21,7 +21,7 @@ class Query(ObjectType):
     departamento = List(Departamento)
     home = List(Home)
     region = List(Region)
-    geoLocation = List(Region, location=String())
+    geoLocation = List(GeoLocation, location=String())
 
     def resolve_anios2021(self, info):
         data = DATA.ANIOS2021
