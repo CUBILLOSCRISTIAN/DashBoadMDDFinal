@@ -146,7 +146,7 @@ class Data():
         geo_locacion = [
             GeoLocation(
                 nombre = data['REGION'],
-                propiedades = data['GEOMETRY'],
+                propiedades = json.loads(data['GEOMETRY']),
                 tipo = 'region'
             ) for i, data in df_data.iterrows()
         ]
@@ -159,7 +159,7 @@ class Data():
         geo_locacion += [
             GeoLocation(
                 nombre = data['DEPARTMENT'],
-                propiedades = data['GEOMETRY'],
+                propiedades = json.loads(data['GEOMETRY']),
                 tipo = 'departamento'
             ) for i, data in df_data.iterrows()
         ]
