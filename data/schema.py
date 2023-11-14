@@ -9,49 +9,19 @@ from .grapheneTypes import (
     Anios2023,
     Departamento,
     Home,
-    Region
+    Region,
+    GeoLocation
 )
 from .bigquery import DATA
 
-class Anios2021Type(ObjectType):
-    class Meta:
-        model = Anios2021
-        fields = '__all__'
-
-class Anios2022Type(ObjectType):
-    class Meta:
-        model = Anios2022
-        fields = '__all__'
-
-class Anios2023Type(ObjectType):
-    class Meta:
-        model = Anios2023
-        fields = '__all__'
-
-class DepartamentoType(ObjectType):
-    class Meta:
-        model = Departamento
-        fields = '__all__'
-
-class HomeType(ObjectType):
-    class Meta:
-        model = Home
-        fields = '__all__'
-
-class RegionType(ObjectType):
-    class Meta:
-        model = Region
-        fields = '__all__'
-
-
-
 class Query(ObjectType):
-    anios2021 = List(Anios2021Type)
-    anios2022 = List(Anios2022Type)
-    anios2023 = List(Anios2023Type)
-    departamento = List(DepartamentoType)
-    home = List(HomeType)
-    region = List(RegionType)
+    anios2021 = List(Anios2021)
+    anios2022 = List(Anios2022)
+    anios2023 = List(Anios2023)
+    departamento = List(Departamento)
+    home = List(Home)
+    region = List(Region)
+    geoLocation = List(Region, location=String())
 
     def resolve_anios2021(self, info):
         data = DATA.ANIOS2021
@@ -75,6 +45,12 @@ class Query(ObjectType):
 
     def resolve_region(self, info):
         data = DATA.REGION
+        return data
+
+    def resolve_geoLocation(self, info, location):
+        data = DATA.GEOLOCATION
+        if location:
+            data = filter(lambda x: x['tipo' == location], data)
         return data
     
 schema = Schema(query=Query)

@@ -9,14 +9,15 @@ from .grapheneTypes import (
     Anios2023,
     Departamento,
     Home,
-    Region
+    Region,
+    GeoLocation
 )
 
 
 class Data():
     def __init__(self):
         self.PROJECT = 'proyectofinal-404415'
-        self.DATASET = 'project'
+        self.DATASET = 'WindsForecast'
 
         key = os.path.join(settings.BASE_DIR, 'static/key.json')
         credential = service_account.Credentials.from_service_account_file(key)
@@ -31,18 +32,19 @@ class Data():
         self.DEPARTAMENTO = self.get_departamento()
         self.HOME = self.get_home()
         self.REGION = self.get_region()
+        self.GEOLOCATION = self.get_geo_region()
     
     def get_anios2021(self):
         sql = """
             SELECT *
-            FROM `{}.anios2021`
+            FROM `{}.Años2021`
         """.format(self.DATASET)
         df_data = self.client.query(sql).result().to_dataframe()
 
         anios2021 = [
             Anios2021(
-                fecha = data['fecha'],
-                mediaViento = data['mediaViento']
+                fecha = data['Fecha'],
+                mediaViento = data['MediaViento']
             ) for i, data in df_data.iterrows()
         ]
         return anios2021
@@ -50,14 +52,14 @@ class Data():
     def get_anios2022(self):
         sql = """
             SELECT *
-            FROM `{}.anios2022`
+            FROM `{}.Años2022`
         """.format(self.DATASET)
         df_data = self.client.query(sql).result().to_dataframe()
 
         anios2022 = [
             Anios2022(
-                fecha = data['fecha'],
-                mediaViento = data['mediaViento']
+                fecha = data['Fecha'],
+                mediaViento = data['MediaViento']
             ) for i, data in df_data.iterrows()
         ]
         return anios2022
@@ -65,14 +67,14 @@ class Data():
     def get_anios2023(self):
         sql = """
             SELECT *
-            FROM `{}.anios2023`
+            FROM `{}.Años2023`
         """.format(self.DATASET)
         df_data = self.client.query(sql).result().to_dataframe()
 
         anios2023 = [
             Anios2023(
-                fecha = data['fecha'],
-                mediaViento = data['mediaViento']
+                fecha = data['Fecha'],
+                mediaViento = data['MediaViento']
             ) for i, data in df_data.iterrows()
         ]
         return anios2023
@@ -80,16 +82,18 @@ class Data():
     def get_departamento(self):
         sql = """
             SELECT *
-            FROM `{}.departamento`
+            FROM `{}.Departamentos`
         """.format(self.DATASET)
         df_data = self.client.query(sql).result().to_dataframe()
 
         departamento = [
             Departamento(
-                nombre = data['nombre'],
-                cantidadEstaciones = data['cantidadEstaciones'],
-                media = data['media'],
-                mediana = data['mediana']
+                nombre = data['Departamento'],
+                medVel = data['MedianaVelocidad'],
+                avgVel = data['MediaVelocidad'],
+                medDir = data['MedianaDireccion'],
+                avgDir = data['MediaDireccion'],
+                noEstaciones = data['CantidadEstaciones']
             ) for i, data in df_data.iterrows()
         ]
         return departamento
@@ -97,7 +101,7 @@ class Data():
     def get_home(self):
         sql = """
             SELECT *
-            FROM `{}.home`
+            FROM `{}.Home`
         """.format(self.DATASET)
         df_data = self.client.query(sql).result().to_dataframe()
 
@@ -117,20 +121,48 @@ class Data():
     def get_region(self):
         sql = """
             SELECT *
-            FROM `{}.region`
+            FROM `{}.Region`
         """.format(self.DATASET)
         df_data = self.client.query(sql).result().to_dataframe()
 
         region = [
             Region(
-                region = data['region'],
-                medVel = data['medVel'],
-                avgVel = data['avgVel'],
-                medDir = data['medDir'],
-                avgDir = data['avgDir'],
-                noEstaciones = data['noEstaciones']
+                region = data['Region'],
+                medVel = data['MedianaVelocidad'],
+                avgVel = data['MediaVelocidad'],
+                medDir = data['MedianaDireccion'],
+                avgDir = data['MediaDireccion'],
+                noEstaciones = data['NumeroEstaciones']
             ) for i, data in df_data.iterrows()
         ]
         return region
+
+    def get_geo_region(self):
+        sql = """
+            SELECT *
+            FROM `{}.geo_region`
+        """.format(self.DATASET)
+        df_data = self.client.query(sql).result().to_dataframe()
+        geo_locacion = [
+            GeoLocation(
+                nombre = data['REGION'],
+                propiedades = data['GEOMETRY'],
+                tipo = 'region'
+            ) for i, data in df_data.iterrows()
+        ]
+
+        sql = """
+            SELECT *
+            FROM `{}.geo_department`
+        """.format(self.DATASET)
+        df_data = self.client.query(sql).result().to_dataframe()
+        geo_locacion += [
+            GeoLocation(
+                nombre = data['DEPARTMENT'],
+                propiedades = data['GEOMETRY'],
+                tipo = 'departamento'
+            ) for i, data in df_data.iterrows()
+        ]
+        return geo_locacion
 
 DATA = Data()

@@ -20,12 +20,10 @@ from django.urls import path, include
 
 from graphene_django.views import GraphQLView
 from data.schema import schema
-from service.views import GeneralDataView
 
 from graphene_django.views import GraphQLView
 
 urlpatterns = [
-    path('', GeneralDataView.as_view(), name='home'),
     path('admin/', admin.site.urls),
     path("graphql", GraphQLView.as_view(graphiql=True, schema=schema)),
     path('', include(('service.urls', 'service'), namespace='service')),

@@ -16,9 +16,11 @@ class Anios2023(graphene.ObjectType):
 
 class Departamento(graphene.ObjectType):
     nombre = graphene.String()
-    cantidadEstaciones = graphene.Int()
-    media = graphene.Float()
-    mediana = graphene.Float()
+    medVel  = graphene.Float()
+    avgVel = graphene.Float()
+    medDir = graphene.Float()
+    avgDir = graphene.Float()
+    noEstaciones = graphene.Int()
 
 class Home(graphene.ObjectType):
     media = graphene.Float()
@@ -37,3 +39,7 @@ class Region(graphene.ObjectType):
     avgDir = graphene.Float()
     noEstaciones = graphene.Int()
 
+class GeoLocation(graphene.ObjectType):
+    propiedades = graphene.JSONString()
+    nombre = graphene.String()
+    tipo = graphene.String()
