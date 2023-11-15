@@ -197,7 +197,7 @@ class ForescatingView(FormView):
             solution = model._Booster.predict(array(entrada).reshape(1,-1))[0]
         kwargs.update({
             'form': form,
-            'solution': f'Para una latitud {entrada[0][0]} y longitud {entrada[0][1]} prededimos una velocidad de {solution} m/s' if solution else ''
+            'solution': f'Para una latitud {entrada[0][0]} y longitud {entrada[0][1]} predecimos una velocidad de {solution} m/s' if solution else ''
         })
         return super().get_context_data(**kwargs)
     
