@@ -10,7 +10,8 @@ from .grapheneTypes import (
     Departamento,
     Home,
     Region,
-    GeoLocation
+    GeoLocation,
+    Municipio
 )
 from .bigquery import DATA
 
@@ -22,6 +23,7 @@ class Query(ObjectType):
     home = List(Home)
     region = List(Region)
     geoLocation = List(GeoLocation, location=String())
+    municipios = List(Municipio)
 
     def resolve_anios2021(self, info):
         data = DATA.ANIOS2021
@@ -51,6 +53,10 @@ class Query(ObjectType):
         data = DATA.GEOLOCATION
         if location:
             data = [*filter(lambda x: x.tipo == location, data)]
+        return data
+
+    def resolve_municipios(self, info):
+        data = DATA.MUNICIPIOS
         return data
     
 schema = Schema(query=Query)
