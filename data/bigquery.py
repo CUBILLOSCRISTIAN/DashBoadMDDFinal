@@ -10,7 +10,8 @@ from .grapheneTypes import (
     Departamento,
     Home,
     Region,
-    GeoLocation
+    GeoLocation,
+    Municipio
 )
 
 
@@ -33,6 +34,7 @@ class Data():
         self.HOME = self.get_home()
         self.REGION = self.get_region()
         self.GEOLOCATION = self.get_geo_region()
+        self.MUNICIPIOS = self.get_municipios()
     
     def get_anios2021(self):
         sql = """
@@ -164,5 +166,22 @@ class Data():
             ) for i, data in df_data.iterrows()
         ]
         return geo_locacion
+
+    def get_municipios(self):
+        sql = """
+            SELECT *
+            FROM `{}.Municipios`
+        """.format(self.DATASET)
+        df_data = self.client.query(sql).result().to_dataframe()
+
+        region = [
+            Municipio(
+                codigo = data['Codigo'],
+                latitud = data['Latitud'],
+                longitud = data['Longitud'],
+                nombre = data['Municipio']
+            ) for i, data in df_data.iterrows()
+        ]
+        return region
 
 DATA = Data()

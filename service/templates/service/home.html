@@ -7,20 +7,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
 
-<body>    
-    {{ cantMunicipio }} <br>
-    {{ canDepartamento }} <br>
-    {{ cantRegion }} <br>
-    {{ cantEstacion }} <br>
-    {{ cantEstacion }} <br>
-    {{ cantRegistros }} <br>
-
-    <iframe width="100%" height="500px" src="{% static anios_2021_url %}" frameborder="0"></iframe>
-    <iframe width="100%" height="500px" src="{% static anios_2022_url %}" frameborder="0"></iframe>
-    <iframe width="100%" height="500px" src="{% static anios_2023_url %}" frameborder="0"></iframe>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'service:home' %}"><button>INICIO</button></a>
+            <a href="{% url 'service:region' %}"><button>REGION</button></a>
+            <a href="{% url 'service:departamento' %}"><button>DEPARTAMENTO</button></a>
+            <a href="{% url 'service:forescating' %}"><button>PREDICCION</button></a>
+        </nav>
+    </header>
+    <article>
+        <div class="info">
+            <div class="card">Número de registros<br>{{ cantRegistros }}</div>
+            <div class="card">Numero de estaciones<br>{{ cantEstacion }}</div>
+            <div class="card">Numero de regiones<br>{{ cantRegion }}</div>
+            <div class="card">Numero de departamentos<br>{{ canDepartamento }}</div>
+            <div class="card">Numero de municipios<br>{{ cantMunicipio }}</div>
+        </div>
+        <div class="graphs">
+            <p>Tiempo (año 2021) VS Velocidad (m/s)</p>
+            <iframe width="100%" height="80%" src="{% static anios_2021_url %}" frameborder="0"></iframe>
+            <hr>
+            <p>Tiempo (año 2022) VS Velocidad (m/s)</p>
+            <iframe width="100%" height="80%" src="{% static anios_2022_url %}" frameborder="0"></iframe>
+            <hr>
+            <p>Tiempo (año 2023) VS Velocidad (m/s)</p>
+            <iframe width="100%" height="80%" src="{% static anios_2023_url %}" frameborder="0"></iframe>
+        </div>
+    </article>
 </body>
 
 </html>

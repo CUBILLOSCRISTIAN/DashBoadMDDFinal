@@ -1,0 +1,38 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departamento</title>
+    <link rel="stylesheet" href="{% static 'css/forescating.css' %}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'service:home' %}"><button>INICIO</button></a>
+            <a href="{% url 'service:region' %}"><button>REGION</button></a>
+            <a href="{% url 'service:departamento' %}"><button>DEPARTAMENTO</button></a>
+            <a href="{% url 'service:forescating' %}"><button>PREDICCION</button></a>
+        </nav>
+    </header>
+    <article>
+        <div class="title">
+            Predicción de la hora 01:00 a apartir de la hora 00:00
+        </div>
+        <form action="{% url 'service:forescating' %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit">
+        </form>
+        <div class="salida">
+            {{ solution }}
+        </div>
+    </article>
+</body>
+
+</html>

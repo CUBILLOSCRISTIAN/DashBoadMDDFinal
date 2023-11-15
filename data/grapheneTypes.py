@@ -43,3 +43,9 @@ class GeoLocation(graphene.ObjectType):
     propiedades = graphene.JSONString()
     nombre = graphene.String()
     tipo = graphene.String()
+
+class Municipio(graphene.ObjectType):
+    codigo = graphene.Int()
+    latitud = graphene.Float()
+    longitud = graphene.Float()
+    nombre = graphene.String()

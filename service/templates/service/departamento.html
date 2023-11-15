@@ -8,13 +8,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Departamento</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/other.css' %}">
 </head>
 
-<body>    
-    <iframe width="100%" height="500px" src="{% static departamento_media_mediana_url %}" frameborder="0"></iframe>
-    <iframe width="100%" height="500px" src="{% static departamento_media_estaciones_url %}" frameborder="0"></iframe>
-    <!--<iframe width="100%" height="500px" src="{% static departamento_map_url %}" frameborder="0"></iframe>-->
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'service:home' %}"><button>INICIO</button></a>
+            <a href="{% url 'service:region' %}"><button>REGION</button></a>
+            <a href="{% url 'service:departamento' %}"><button>DEPARTAMENTO</button></a>
+            <a href="{% url 'service:forescating' %}"><button>PREDICCION</button></a>
+        </nav>
+    </header>
+    <article>
+        <div class="row row-1">
+            <iframe class="media_mediana" width="100%" height="500px" src="{% static departamento_media_mediana_url %}" frameborder="0"></iframe>
+            <iframe class="map" width="100%" height="500px" src="{% static departamento_map_url %}" frameborder="0"></iframe>
+        </div>
+        <div class="row row-2">
+            <iframe class="rose" width="100%" height="800px" src="{% static departamento_rose_url %}" frameborder="0"></iframe>
+            <iframe class="estaciones" width="100%" height="800px" src="{% static departamento_media_estaciones_url %}" frameborder="0"></iframe>
+        </div>
+    </article>
 </body>
 
 </html>

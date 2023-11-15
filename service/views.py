@@ -1,7 +1,9 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
+from django.conf import settings
+from numpy import array
+import joblib, os, ast
 
 from data.schema import schema
-
 from .utils import (
     generate_anios_graph,
     generate_region_media_mediana_graph,
@@ -9,8 +11,12 @@ from .utils import (
     generate_region_map_graph,
     generate_departamento_media_mediana_graph,
     generate_departamento_estaciones_velocidad_graph,
-    generate_region_rose_diagram
+    generate_region_rose_diagram,
+    generate_departamento_rose_diagram,
+    generate_departamento_map_graph,
+    get_municipios
 )
+from .forms import FormPrediction
 
 class GeneralDataView(TemplateView):
     template_name = 'service/home.html'
@@ -152,12 +158,53 @@ class DepartamentoDataView(TemplateView):
 
         departamento_media_mediana_graph = generate_departamento_media_mediana_graph(result_, 'departamento_media_mediana')
         departamento_media_estaciones_graph = generate_departamento_estaciones_velocidad_graph(result_, 'departamento_media_estaciones')
-        # departamento_map_graph = generate_region_map_graph(result_, geoResult_, 'region_map')
-        
+        departamento_map_graph = generate_departamento_map_graph(result_, geoResult_, 'departamento_map')
+        departamento_rose_graph = generate_departamento_rose_diagram(result_, 'departamento_rose')
+
         kwargs.update({
             'departamento_media_mediana_url': departamento_media_mediana_graph,
             'departamento_media_estaciones_url': departamento_media_estaciones_graph,
-            # 'region_map_url': departamento_map_graph,
+            'departamento_map_url': departamento_map_graph,
+            'departamento_rose_url': departamento_rose_graph
         })
         
         return super().get_context_data(**kwargs)
+
+
+class ForescatingView(FormView):
+    template_name = 'service/forescating.html'
+    form_class = FormPrediction
+
+    query = """
+        {
+            municipios{
+                nombre
+                latitud
+                longitud
+                codigo
+            }
+        }
+    """
+    result_ = schema.execute(query).data['municipios']
+    municipios = get_municipios(result_)
+    form = FormPrediction(municipios)
+
+    def get_context_data(self, form=form, entrada=[], **kwargs):
+        solution = ''
+        url = os.path.join(settings.BASE_DIR, 'static/models/model_predict_hour_1.pkl')
+        if entrada: 
+            model = joblib.load(url)
+            solution = model._Booster.predict(array(entrada).reshape(1,-1))[0]
+        kwargs.update({
+            'form': form,
+            'solution': f'Para una latitud {entrada[0][0]} y longitud {entrada[0][1]} predecimos una velocidad de {solution} m/s' if solution else ''
+        })
+        return super().get_context_data(**kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        form = FormPrediction(self.municipios, request.POST)
+        if form.is_valid():
+            lugar = ast.literal_eval(form.cleaned_data['lugar'])
+            velocidad = form.cleaned_data['velocidad']
+            return self.render_to_response(self.get_context_data(form=form, entrada=[lugar + [velocidad]]))
+        return self.render_to_response(self.get_context_data(form=form))
